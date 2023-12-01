@@ -1,0 +1,43 @@
+
+Create custom middleware 
+------------------------------
+php artisan make:middleware AdminAuthMiddleware
+
+You will add below this code in AdminAuthMiddleware file
+
+public function handle($request, Closure $next)
+    {
+
+        if (Auth::check() && Auth::User()->roles()->first()->name === 'Admin') {
+
+            return $next($request);
+        }
+
+        //   return route('admin.login');
+
+        abort(403);
+        
+    }
+
+php artisan make:middleware PreventBackHistory
+
+You will add below this code in PreventBackHistory
+
+public function handle(Request $request, Closure $next)
+    {
+        $response = $next($request);
+        return $response->header('Cache-Control','nocache, no-store, max-age=0, must-revalidate')
+            ->header('Pragma','no-cache')
+            ->header('Expires','Sun, 02 Jan 1990 00:00:00 GMT');
+    }
+
+
+
+You  will add below code in kernel.php file located at Http folder
+
+protected $middlewareAliases = [
+
+        'admin.auth' => \App\Http\Middleware\AdminAuthMiddleware::class,
+        'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
+];
+
